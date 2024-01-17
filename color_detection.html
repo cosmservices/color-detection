@@ -1,1 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #video {
+      display: block;
+      margin: 20px 0;
+    }
+    #canvas {
+      display: block;
+      margin: 20px 0;
+      border: 1px solid #000;
+    }
+  </style>
+  <title>Color Detection</title>
+</head>
+<body>
+  <h1>Color Detection</h1>
+  <video id="video" width="640" height="480" autoplay></video>
+  <canvas id="canvas" width="640" height="480"></canvas>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error('Error accessing the camera:', error);
+        });
+
+      video.addEventListener('play', () => {
+        function detectColor() {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // Get pixel data from the canvas
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          // Loop through pixels and check for red color
+          for (let i = 0; i < data.length; i += 4) {
+            const red = data[i];
+            const green = data[i + 1];
+            const blue = data[i + 2];
+
+            // Adjust these values based on your specific shade of red
+            if (red > 200 && green < 100 && blue < 100) {
+              console.log('Color detected: Red');
+              break;
+            }
+          }
+
+          requestAnimationFrame(detectColor);
+        }
+
+        detectColor();
+      });
+    });
+  </script>
+</body>
+</html>
