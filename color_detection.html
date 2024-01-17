@@ -14,10 +14,10 @@
       border: 1px solid #000;
     }
   </style>
-  <title>Color Detection with Cooldown</title>
+  <title>Color Detection with Cooldown and Audio</title>
 </head>
 <body>
-  <h1>Color Detection with Cooldown</h1>
+  <h1>Color Detection with Cooldown and Audio</h1>
   <video id="video" width="640" height="480" autoplay></video>
   <canvas id="canvas" width="640" height="480"></canvas>
 
@@ -35,6 +35,12 @@
         .catch((error) => {
           console.error('Error accessing the camera:', error);
         });
+
+      // Function to play an audio file
+      function playAudio() {
+        const audio = new Audio('https://raw.githubusercontent.com/ylo2403/color-detection/main/beep.mp3');
+        audio.play();
+      }
 
       video.addEventListener('play', () => {
         function detectColor() {
@@ -57,6 +63,7 @@
               // Adjust these values based on your specific shade of red
               if (red > 200 && green < 100 && blue < 100) {
                 console.log('Color detected: Red');
+                playAudio(); // Play audio when red is detected
                 lastDetectionTime = currentTime;
                 break;
               }
