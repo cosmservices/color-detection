@@ -28,7 +28,7 @@
       const ctx = canvas.getContext('2d');
       let lastDetectionTime = 0;
 
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ facingMode: 'environment' })
         .then((stream) => {
           video.srcObject = stream;
         })
