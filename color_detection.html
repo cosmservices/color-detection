@@ -14,10 +14,10 @@
       border: 1px solid #000;
     }
   </style>
-  <title>Color Detection</title>
+  <title>Color Detection with Cooldown</title>
 </head>
 <body>
-  <h1>Color Detection</h1>
+  <h1>Color Detection with Cooldown</h1>
   <video id="video" width="640" height="480" autoplay></video>
   <canvas id="canvas" width="640" height="480"></canvas>
 
@@ -26,6 +26,7 @@
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
+      let lastDetectionTime = 0;
 
       navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
@@ -37,22 +38,28 @@
 
       video.addEventListener('play', () => {
         function detectColor() {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const currentTime = Date.now();
+          const elapsedTimeSinceLastDetection = currentTime - lastDetectionTime;
 
-          // Get pixel data from the canvas
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = imageData.data;
+          if (elapsedTimeSinceLastDetection >= 5000) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-          // Loop through pixels and check for red color
-          for (let i = 0; i < data.length; i += 4) {
-            const red = data[i];
-            const green = data[i + 1];
-            const blue = data[i + 2];
+            // Get pixel data from the canvas
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
 
-            // Adjust these values based on your specific shade of red
-            if (red > 200 && green < 100 && blue < 100) {
-              console.log('Color detected: Red');
-              break;
+            // Loop through pixels and check for red color
+            for (let i = 0; i < data.length; i += 4) {
+              const red = data[i];
+              const green = data[i + 1];
+              const blue = data[i + 2];
+
+              // Adjust these values based on your specific shade of red
+              if (red > 200 && green < 100 && blue < 100) {
+                console.log('Color detected: Red');
+                lastDetectionTime = currentTime;
+                break;
+              }
             }
           }
 
