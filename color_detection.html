@@ -42,19 +42,19 @@
     #notification-bar {
       display: none;
       position: fixed;
-      top: 10px; /* Adjusted top position for better visibility */
+      top: -60px; /* Initially set to be above the viewport */
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
       max-width: 400px;
-      background-color: #FF0000; /* Red color for the notification bar */
+      background-color: #808080; /* Gray background color for the notification bar */
       color: #ffffff;
       text-align: center;
       padding: 10px;
       font-size: 18px;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-      transition: top 0.5s ease-in-out;
       border-radius: 10px;
+      transition: top 0.5s ease-in-out; /* Transition for smooth sliding animation */
     }
   </style>
   <title>CosmReader</title>
@@ -97,9 +97,9 @@
       // Function to show a custom notification
       function showCustomNotification(text) {
         notificationBar.textContent = text;
-        notificationBar.style.display = 'block'; /* Display the notification bar */
+        notificationBar.style.top = '10px'; /* Adjusted top position for better visibility */
         setTimeout(() => {
-          notificationBar.style.display = 'none'; // Hide after 5 seconds
+          notificationBar.style.top = '-60px'; // Slide back up after 5 seconds
         }, 5000);
       }
 
