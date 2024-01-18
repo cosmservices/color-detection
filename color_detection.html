@@ -16,57 +16,132 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      color: #333; /* Setting the color for the text */
+      color: #333;
+      overflow: hidden;
+      transition: background-color 0.5s;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .loading-spinner {
+      border: 8px solid #3498db;
+      border-top: 8px solid #f5f5f5;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     h1 {
       font-family: 'Brush Script MT', cursive;
-      margin-bottom: 20px; /* Add some spacing below the h1 */
+      margin-bottom: 20px;
     }
 
     #video {
-      display: block;
+      display: none;
       margin: 20px 0;
-      width: 80%; /* Adjusted width for better fit */
-      max-width: 640px; /* Set a maximum width to avoid stretching */
-      transform: scaleX(-1); /* Flip the video horizontally for better user experience */
-      border: 5px solid #fff; /* White border around video */
+      width: 80%;
+      max-width: 640px;
+      transform: scaleX(-1);
+      border: 5px solid #fff;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       border-radius: 10px;
     }
 
     #canvas {
-      display: none; /* Hide the canvas element */
+      display: none;
     }
 
     #notification-bar {
-      display: none;
       position: fixed;
-      top: -60px; /* Initially set to be above the viewport */
+      top: -60px;
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
       max-width: 400px;
-      background-color: #808080; /* Gray background color for the notification bar */
+      background-color: #808080;
       color: #ffffff;
       text-align: center;
       padding: 10px;
       font-size: 18px;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
       border-radius: 10px;
-      transition: top 0.5s ease-in-out; /* Transition for smooth sliding animation */
+      transition: top 0.5s ease-in-out;
+    }
+
+    #dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    #interactive-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #ff7300, #4db6ac);
+      z-index: -1;
+      animation: gradientAnimation 5s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Add dark mode styles */
+    body.dark-mode {
+      background-color: #333;
+      color: #fff;
+    }
+
+    #notification-bar.dark-mode {
+      background-color: #555;
+      color: #fff;
+    }
+
+    #dark-mode-toggle.dark-mode {
+      filter: invert(1);
     }
   </style>
   <title>CosmReader</title>
 </head>
 <body>
+  <div id="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
   <h1>CosmReader</h1>
   <video id="video" width="640" height="480" autoplay></video>
   <canvas id="canvas" width="640" height="480"></canvas>
   <div id="notification-bar"></div>
+  <div id="dark-mode-toggle" onclick="toggleDarkMode()">🌙</div>
+  <div class="live-chat-button" onclick="toggleChat()">Live Chat</div>
+  <div id="interactive-background"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const loadingOverlay = document.getElementById('loading-overlay');
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
@@ -80,9 +155,15 @@
         },
       };
 
+      // Show loading overlay while the page is loading
+      window.addEventListener('load', () => {
+        loadingOverlay.style.display = 'none';
+      });
+
       navigator.mediaDevices.getUserMedia(constraints)
         .then((stream) => {
           video.srcObject = stream;
+          video.style.display = 'block'; // Show the video once it's ready
         })
         .catch((error) => {
           console.error('Error accessing the camera:', error);
@@ -97,9 +178,9 @@
       // Function to show a custom notification
       function showCustomNotification(text) {
         notificationBar.textContent = text;
-        notificationBar.style.top = '10px'; /* Adjusted top position for better visibility */
+        notificationBar.style.top = '10px';
         setTimeout(() => {
-          notificationBar.style.top = '-60px'; // Slide back up after 5 seconds
+          notificationBar.style.top = '-60px';
         }, 5000);
       }
 
@@ -111,18 +192,15 @@
           if (elapsedTimeSinceLastDetection >= 5000) {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Get pixel data from the canvas
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            // Loop through pixels and check for red color
             let isRedDetected = false;
             for (let i = 0; i < data.length; i += 4) {
               const red = data[i];
               const green = data[i + 1];
               const blue = data[i + 2];
 
-              // Adjust these values based on your specific shade of red
               if (red > 150 && green < 100 && blue < 100) {
                 isRedDetected = true;
                 break;
@@ -131,9 +209,9 @@
 
             if (isRedDetected) {
               console.log('Color detected: Red');
-              playBeepSound(); // Play beep sound when red is detected
+              playBeepSound();
               const notificationText = 'Successfully detected the color red!';
-              showCustomNotification(notificationText); // Show custom notification on successful red detection
+              showCustomNotification(notificationText);
               lastDetectionTime = currentTime;
             }
           }
@@ -144,6 +222,19 @@
         detectRedColor();
       });
     });
+
+    // Toggle dark mode
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle('dark-mode');
+    }
+
+    // Toggle live chat
+    function toggleChat() {
+      // Implement your live chat toggle logic here
+      // You may need to add the Tawk.to script back if you decide to use it
+      alert('Live chat feature is not implemented in this example.');
+    }
   </script>
 </body>
 </html>
