@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://github.com/ylo2403/color-detection/raw/main/CosmoSystems_White.png" type="image/png">
+  <link rel="shortcut icon" href="https://github.com/ylo2403/color-detection/raw/main/CosmoSystems_White.png" type="image/png">
   <style>
     body {
       font-family: 'Brush Script MT', cursive;
@@ -25,6 +27,8 @@
     #video {
       display: block;
       margin: 20px 0;
+      width: 80%; /* Adjusted width for better fit */
+      max-width: 640px; /* Set a maximum width to avoid stretching */
       transform: scaleX(-1); /* Flip the video horizontally for better user experience */
       border: 5px solid #fff; /* White border around video */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -32,10 +36,7 @@
     }
 
     #canvas {
-      display: block;
-      margin: 20px 0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      display: none; /* Hide the canvas element */
     }
 
     #notification-bar {
@@ -56,10 +57,10 @@
       border-radius: 10px;
     }
   </style>
-  <title>Color Detection with Custom Notification</title>
+  <title>CosmReader</title>
 </head>
 <body>
-  <h1>Color Detection with Custom Notification</h1>
+  <h1>CosmReader</h1>
   <video id="video" width="640" height="480" autoplay></video>
   <canvas id="canvas" width="640" height="480"></canvas>
   <div id="notification-bar"></div>
