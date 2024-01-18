@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #video {
+      display: block;
+      margin: 20px 0;
+      transform: scaleX(-1); /* Flip the video horizontally for better user experience */
+    }
+    #canvas {
+      display: block;
+      margin: 20px 0;
+      border: 1px solid #000;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+  <title>Barcode Detection with Cooldown and Audio</title>
+</head>
+<body>
+  <h1>Barcode Detection with Cooldown and Audio</h1>
+  <video id="video" width="640" height="480" autoplay></video>
+  <canvas id="canvas" width="640" height="480"></canvas>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      let lastDetectionTime = 0;
+
+      // Constraints to access the back camera
+      const constraints = {
+        video: {
+          facingMode: 'environment', // Use the back camera
+        },
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error('Error accessing the camera:', error);
+        });
+
+      // Function to play the beep sound
+      function playBeepSound() {
+        const audio = new Audio('https://raw.githubusercontent.com/ylo2403/color-detection/main/beep.mp3');
+        audio.play();
+      }
+
+      // Function to show a green notification
+      function showGreenNotification() {
+        if (Notification.permission === 'granted') {
+          new Notification('CosmScanner', { body: 'Successfully scanned the ticket!', icon: 'green-icon.png' });
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+              new Notification('CosmScanner', { body: 'Successfully scanned the ticket!', icon: 'green-icon.png' });
+            }
+          });
+        }
+      }
+
+      video.addEventListener('play', () => {
+        function detectBarcode() {
+          const currentTime = Date.now();
+          const elapsedTimeSinceLastDetection = currentTime - lastDetectionTime;
+
+          if (elapsedTimeSinceLastDetection >= 5000) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get the current video frame as an image
+            const imageData = canvas.toDataURL('image/png');
+
+            // Use QuaggaJS to decode the barcode
+            Quagga.decodeSingle({
+              decoder: {
+                readers: ['code_128_reader'] // You can add more readers as needed
+              },
+              locate: true,
+              src: imageData
+            }, (result) => {
+              if (result && result.codeResult && result.codeResult.code) {
+                console.log('Barcode detected:', result.codeResult.code);
+                playBeepSound(); // Play beep sound when barcode is detected
+                showGreenNotification(); // Show green notification on successful scan
+                lastDetectionTime = currentTime;
+              }
+            });
+          }
+
+          requestAnimationFrame(detectBarcode);
+        }
+
+        // Initialize QuaggaJS
+        Quagga.init({
+          inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: video
+          },
+          locator: {
+            patchSize: "medium",
+            halfSample: false
+          },
+          numOfWorkers: 1,
+          decoder: {
+            readers: ["code_128_reader"] // You can add more readers as needed
+          },
+          locate: true
+        }, (err) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          Quagga.start();
+          detectBarcode();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
