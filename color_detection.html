@@ -47,7 +47,7 @@
       transform: translateX(-50%);
       width: 80%;
       max-width: 400px;
-      background-color: #4CAF50;
+      background-color: #FF0000; /* Red color for the notification bar */
       color: #ffffff;
       text-align: center;
       padding: 10px;
@@ -104,7 +104,7 @@
       }
 
       video.addEventListener('play', () => {
-        function detectWhiteColor() {
+        function detectRedColor() {
           const currentTime = Date.now();
           const elapsedTimeSinceLastDetection = currentTime - lastDetectionTime;
 
@@ -115,33 +115,33 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            // Loop through pixels and check for white color
-            let isWhiteDetected = true;
+            // Loop through pixels and check for red color
+            let isRedDetected = false;
             for (let i = 0; i < data.length; i += 4) {
               const red = data[i];
               const green = data[i + 1];
               const blue = data[i + 2];
 
-              // Adjust these values based on your specific shade of white
-              if (red < 200 || green < 200 || blue < 200) {
-                isWhiteDetected = false;
+              // Adjust these values based on your specific shade of red
+              if (red > 150 && green < 100 && blue < 100) {
+                isRedDetected = true;
                 break;
               }
             }
 
-            if (isWhiteDetected) {
-              console.log('Color detected: White');
-              playBeepSound(); // Play beep sound when white is detected
-              const notificationText = 'Successfully detected the color white!';
-              showCustomNotification(notificationText); // Show custom notification on successful white detection
+            if (isRedDetected) {
+              console.log('Color detected: Red');
+              playBeepSound(); // Play beep sound when red is detected
+              const notificationText = 'Successfully detected the color red!';
+              showCustomNotification(notificationText); // Show custom notification on successful red detection
               lastDetectionTime = currentTime;
             }
           }
 
-          requestAnimationFrame(detectWhiteColor);
+          requestAnimationFrame(detectRedColor);
         }
 
-        detectWhiteColor();
+        detectRedColor();
       });
     });
   </script>
