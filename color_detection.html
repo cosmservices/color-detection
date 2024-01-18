@@ -14,19 +14,35 @@
       margin: 20px 0;
       border: 1px solid #000;
     }
+    #notification-bar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #4CAF50;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+      font-size: 18px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      transition: top 0.5s ease-in-out;
+    }
   </style>
-  <title>Color Detection with Cooldown and Audio</title>
+  <title>Color Detection with Custom Notification</title>
 </head>
 <body>
-  <h1>Color Detection with Cooldown and Audio</h1>
+  <h1>Color Detection with Custom Notification</h1>
   <video id="video" width="640" height="480" autoplay></video>
   <canvas id="canvas" width="640" height="480"></canvas>
+  <div id="notification-bar"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
+      const notificationBar = document.getElementById('notification-bar');
       let lastDetectionTime = 0;
 
       // Constraints to access the back camera
@@ -50,21 +66,17 @@
         audio.play();
       }
 
-      // Function to show a green notification
-      function showGreenNotification() {
-        if (Notification.permission === 'granted') {
-          new Notification('CosmScanner', { body: 'Successfully scanned the ticket!', icon: 'green-icon.png' });
-        } else if (Notification.permission !== 'denied') {
-          Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-              new Notification('CosmScanner', { body: 'Successfully scanned the ticket!', icon: 'green-icon.png' });
-            }
-          });
-        }
+      // Function to show a custom notification
+      function showCustomNotification(text) {
+        notificationBar.textContent = text;
+        notificationBar.style.top = '0';
+        setTimeout(() => {
+          notificationBar.style.top = '-50px'; // Slide back up after 5 seconds
+        }, 5000);
       }
 
       video.addEventListener('play', () => {
-        function detectColor() {
+        function detectRedColor() {
           const currentTime = Date.now();
           const elapsedTimeSinceLastDetection = currentTime - lastDetectionTime;
 
@@ -85,17 +97,18 @@
               if (red > 200 && green < 100 && blue < 100) {
                 console.log('Color detected: Red');
                 playBeepSound(); // Play beep sound when red is detected
-                showGreenNotification(); // Show green notification on successful scan
+                const notificationText = 'Successfully detected the color red!';
+                showCustomNotification(notificationText); // Show custom notification on successful red detection
                 lastDetectionTime = currentTime;
                 break;
               }
             }
           }
 
-          requestAnimationFrame(detectColor);
+          requestAnimationFrame(detectRedColor);
         }
 
-        detectColor();
+        detectRedColor();
       });
     });
   </script>
