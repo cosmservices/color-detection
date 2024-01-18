@@ -42,7 +42,7 @@
     #notification-bar {
       display: none;
       position: fixed;
-      top: 0;
+      top: 10px; /* Adjusted top position for better visibility */
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
@@ -97,9 +97,9 @@
       // Function to show a custom notification
       function showCustomNotification(text) {
         notificationBar.textContent = text;
-        notificationBar.style.top = '10px'; /* Adjusted top position for better visibility */
+        notificationBar.style.display = 'block'; /* Display the notification bar */
         setTimeout(() => {
-          notificationBar.style.top = '-50px'; // Slide back up after 5 seconds
+          notificationBar.style.display = 'none'; // Hide after 5 seconds
         }, 5000);
       }
 
