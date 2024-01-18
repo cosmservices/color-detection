@@ -76,7 +76,7 @@
       }
 
       video.addEventListener('play', () => {
-        function detectRedColor() {
+        function detectBlueColor() {
           const currentTime = Date.now();
           const elapsedTimeSinceLastDetection = currentTime - lastDetectionTime;
 
@@ -87,28 +87,28 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
-            // Loop through pixels and check for red color
+            // Loop through pixels and check for blue color
             for (let i = 0; i < data.length; i += 4) {
               const red = data[i];
               const green = data[i + 1];
               const blue = data[i + 2];
 
-              // Adjust these values based on your specific shade of red
-              if (red > 200 && green < 100 && blue < 100) {
-                console.log('Color detected: Red');
-                playBeepSound(); // Play beep sound when red is detected
-                const notificationText = 'Successfully detected the color red!';
-                showCustomNotification(notificationText); // Show custom notification on successful red detection
+              // Adjust these values based on your specific shade of blue
+              if (red < 100 && green < 100 && blue > 200) {
+                console.log('Color detected: Blue');
+                playBeepSound(); // Play beep sound when blue is detected
+                const notificationText = 'Successfully detected the color blue!';
+                showCustomNotification(notificationText); // Show custom notification on successful blue detection
                 lastDetectionTime = currentTime;
                 break;
               }
             }
           }
 
-          requestAnimationFrame(detectRedColor);
+          requestAnimationFrame(detectBlueColor);
         }
 
-        detectRedColor();
+        detectBlueColor();
       });
     });
   </script>
