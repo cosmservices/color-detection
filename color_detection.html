@@ -185,7 +185,7 @@
       }
 
       video.addEventListener('play', () => {
-        function detectRedColor() {
+        function detectAccessCard() {
           const currentTime = Date.now();
           const elapsedTimeSinceLastDetection = currentTime - lastDetectionTime;
 
@@ -194,32 +194,40 @@
 
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
+            const text = 'ACCESS CARD';
+            const textCanvas = document.createElement('canvas');
+            const textCtx = textCanvas.getContext('2d');
+            textCanvas.width = canvas.width;
+            textCanvas.height = canvas.height;
+            textCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imgData = textCtx.getImageData(0, 0, textCanvas.width, textCanvas.height);
 
-            let isRedDetected = false;
-            for (let i = 0; i < data.length; i += 4) {
-              const red = data[i];
-              const green = data[i + 1];
-              const blue = data[i + 2];
-
-              if (red > 150 && green < 100 && blue < 100) {
-                isRedDetected = true;
-                break;
+            const threshold = 0.1;
+            let count = 0;
+            for (let i = 0; i < imgData.data.length; i += 4) {
+              const red = imgData.data[i];
+              const green = imgData.data[i + 1];
+              const blue = imgData.data[i + 2];
+              const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+              if (luminance > threshold) {
+                count++;
               }
             }
+            const percent = count / (imgData.data.length / 4);
 
-            if (isRedDetected) {
-              console.log('Color detected: Red');
+            if (percent > 0.05) {
+              console.log('Text detected: ACCESS CARD');
               playBeepSound();
-              const notificationText = 'CosmOS: Successfully scanned the ticket.';
+              const notificationText = 'CosmOS: Successfully detected ACCESS CARD.';
               showCustomNotification(notificationText);
               lastDetectionTime = currentTime;
             }
           }
 
-          requestAnimationFrame(detectRedColor);
+          requestAnimationFrame(detectAccessCard);
         }
 
-        detectRedColor();
+        detectAccessCard();
       });
     });
 
