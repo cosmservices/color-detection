@@ -175,6 +175,11 @@
         audio.play();
       }
 
+      function playPrintSound() {
+        const audio = new Audio('https://raw.githubusercontent.com/ylo2403/color-detection/main/beep.mp3');
+        audio.play();
+      }
+
       // Function to show a custom notification
       function showCustomNotification(text) {
         notificationBar.textContent = text;
@@ -211,7 +216,7 @@
             if (orangeLineDetected) {
               console.log('Orange line detected');
               playBeepSound();
-              const notificationText = 'CosmOS: Successfully detected an orange line.';
+              const notificationText = 'Successfully scanned the user membership pass. Please continue!';
               showCustomNotification(notificationText);
               lastDetectionTime = currentTime;
             }
