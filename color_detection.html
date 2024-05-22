@@ -176,7 +176,7 @@
       }
 
       function playPrintSound() {
-        const audio = new Audio('https://raw.githubusercontent.com/ylo2403/color-detection/main/beep.mp3');
+        const audio = new Audio('https://raw.githubusercontent.com/ylo2403/color-detection/main/receipt.mp3');
         audio.play();
       }
 
@@ -216,6 +216,7 @@
             if (orangeLineDetected) {
               console.log('Orange line detected');
               playBeepSound();
+              playPrintSound();
               const notificationText = 'Successfully scanned the user membership pass. Please continue!';
               showCustomNotification(notificationText);
               lastDetectionTime = currentTime;
